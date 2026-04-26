@@ -19,8 +19,8 @@ def get_people_in_space(request_url: str) -> any:
     return json.loads(r)['people']
 
 
-def write_to_csv(file_name: str, file_headers: list[str], items: list[str]) -> None:
-    with open(file_name, 'w') as csv_file:
+def write_to_csv(file_name: str, file_headers: list[str], items: list[any]) -> None:
+    with open(file_name, 'w', newline='', encoding='utf-8') as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=file_headers)
         writer.writeheader()
         for row in items:
@@ -36,12 +36,12 @@ def sanitize_filename(filename: str) -> str:
     return filename.replace(' _:', '')
                             
 
-def write_crafts_people(file_headers: list[str], people_list: list[str], crafts_list: set[str]) -> None:
+def write_crafts_people(file_headers: list[str], people_list: list[dict[str, str]], crafts_list: set[str]) -> None:
     logging.info('Writing crafts to CSV')
-    for craft in crafts_list:
+    for craft in sorted(list(crafts_list)):
         file_name = f'{sanitize_filename(craft)}.csv'
         people_list_filtered = filter(lambda man: man['craft'] == craft, people_list)
-        write_to_csv(file_name, file_headers, people_list_filtered)
+        write_to_csv(file_name, file_headers, list(people_list_filtered))
 
 
 def main() -> None:
